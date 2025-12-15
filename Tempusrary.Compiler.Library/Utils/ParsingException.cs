@@ -14,8 +14,9 @@ public class ParsingException : Exception
         {
             context.Add($"{line - 1} | {lines[line - 2]}");
         }
-
+        
         context.Add($"{line} | {lines[line - 1]}");
+        // Add a pointer to the error column
         context.Add($"{new string(' ', column + line.ToString().Length)}^");
 
         if (line < lines.Length)

@@ -2,6 +2,9 @@
 
 namespace Tempusrary.Compiler.Library.Parsing;
 
+/// <summary>
+/// The types of tokens that can be returned by the lexer
+/// </summary>
 public enum TokenType
 {
     Function,
@@ -27,6 +30,9 @@ public enum TokenType
     ExclamationMark
 }
 
+/// <summary>
+/// Represents a token identified by the lexer with associated metadata such as its type, value, and position in the input source
+/// </summary>
 public class Token(TokenType type, string value, int line, int column)
 {
     public TokenType Type { get; } = type;
@@ -37,6 +43,10 @@ public class Token(TokenType type, string value, int line, int column)
     public override string ToString() => $"{Type}: {Value}";
 }
 
+/// <summary>
+/// Processes an input string and converts it into a sequence of tokens
+/// </summary>
+/// <param name="input">The input string to be tokenized</param>
 public class Lexer(string input)
 {
     public readonly string Input = input;
@@ -44,6 +54,9 @@ public class Lexer(string input)
     private int _line = 1;
     private int _column = 1;
 
+    /// <summary>
+    /// A mapping of keywords to their corresponding token types
+    /// </summary>
     private static readonly Dictionary<string, TokenType> Keywords = new()
     {
         { "function", TokenType.Function },
@@ -53,8 +66,14 @@ public class Lexer(string input)
         { "import", TokenType.Import },
     };
 
+    /// <summary>
+    /// Returns the current character in the input string, or '\0' if the end of the string has been reached
+    /// </summary>
     private char Current => _position < Input.Length ? Input[_position] : '\0';
 
+    /// <summary>
+    /// Advances the lexer to the next character in the input string
+    /// </summary>
     private void Next()
     {
         _position++;
@@ -69,6 +88,13 @@ public class Lexer(string input)
         }
     }
 
+    /// <summary>
+    /// Gets the next token from the input
+    /// </summary>
+    /// <returns>The next token</returns>
+    /// <exception cref="ParsingException">
+    /// Thrown when an invalid or unexpected character is encountered
+    /// </exception>
     public Token NextToken()
     {
         while (char.IsWhiteSpace(Current)) Next();
@@ -143,17 +169,15 @@ public class Lexer(string input)
             throw new ParsingException(this, _line, _column, $"Unexpected character: {Current}");
         var identifier = ReadIdentifier();
 
-        return identifier switch
-        {
-            "true" => new Token(TokenType.True, identifier, _line, _column),
-            "false" => new Token(TokenType.False, identifier, _line, _column),
-            _ => Keywords.TryGetValue(identifier, out var type)
+        return Keywords.TryGetValue(identifier, out var type)
                 ? new Token(type, identifier, _line, _column)
-                : new Token(TokenType.Identifier, identifier, _line, _column)
-        };
-
+                : new Token(TokenType.Identifier, identifier, _line, _column);
     }
 
+    /// <summary>
+    /// Reads a string literal from the input, skipping the opening and closing quotes
+    /// </summary>
+    /// <returns>The read string</returns>
     private string ReadString()
     {
         Next(); // Skip the opening quote
@@ -164,6 +188,10 @@ public class Lexer(string input)
         return value;
     }
 
+    /// <summary>
+    /// Reads and extracts an identifier from the current position in the input string until a non-identifier character is encountered
+    /// </summary>
+    /// <returns>The substring representing the extracted identifier</returns>
     private string ReadIdentifier()
     {
         var start = _position;

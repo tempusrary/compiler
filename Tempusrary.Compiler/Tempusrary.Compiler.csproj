@@ -7,4 +7,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Tempusrary.Compiler.Library\Tempusrary.Compiler.Library.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.CommandLine" Version="2.0.1" />
+    </ItemGroup>
+
 </Project>

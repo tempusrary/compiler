@@ -14,6 +14,9 @@ public class Parser
         _currentToken = _lexer.NextToken();
     }
 
+    /// <summary>Eats the current token if it matches the expected type, advancing the lexer to the next token</summary>
+    /// <param name="type">The expected <see cref="TokenType"/> of the current token</param>
+    /// <exception cref="ParsingException">Thrown when the current token does not match the expected type</exception>
     private void Eat(TokenType type)
     {
         if (_currentToken.Type == type)
@@ -26,6 +29,10 @@ public class Parser
         }
     }
 
+    /// <summary>
+    /// Parses multiple function declarations from the input tokens
+    /// </summary>
+    /// <returns>A list of <see cref="FunctionDeclaration"/> objects with the parsed functions</returns>
     public List<FunctionDeclaration> ParseFunctions()
     {
         var functions = new List<FunctionDeclaration>();
@@ -46,6 +53,10 @@ public class Parser
         return functions;
     }
 
+    /// <summary>
+    /// Parses a function declaration, including its name, parameters, and body
+    /// </summary>
+    /// <returns>A <see cref="FunctionDeclaration"/> representing the parsed function</returns>
     public FunctionDeclaration ParseFunction()
     {
         Eat(TokenType.Function);
@@ -73,6 +84,10 @@ public class Parser
         return new FunctionDeclaration(functionName, parameters, body);
     }
 
+    /// <summary>
+    /// Parses a general statement
+    /// </summary>
+    /// <returns>An <see cref="AstNode"/> representing the parsed statement</returns>
     private AstNode ParseStatement()
     {
         switch (_currentToken.Type)
@@ -113,6 +128,10 @@ public class Parser
         }
     }
 
+    /// <summary>
+    /// Parses an `if` statement.
+    /// </summary>
+    /// <returns>An <see cref="IfStatement"/> representing the parsed if statement</returns>
     private IfStatement ParseIfStatement()
     {
         Eat(TokenType.If);
@@ -131,7 +150,11 @@ public class Parser
         return new IfStatement(condition, body);
     }
 
-
+    /// <summary>
+    /// Parses a primary expression, which can be a literal or an identifier.
+    /// </summary>
+    /// <returns>The primary expression</returns>
+    /// <exception cref="ParsingException"></exception>
     private AstNode ParsePrimary()
     {
         switch (_currentToken.Type)
@@ -159,6 +182,10 @@ public class Parser
         }
     }
 
+    /// <summary>
+    /// Parses a binary expression, specifically for equality checks.
+    /// </summary>
+    /// <returns>The binary expression</returns>
     private BinaryExpression ParseExpression()
     {
         var left = ParsePrimary();
@@ -170,6 +197,10 @@ public class Parser
         return new BinaryExpression(left, operatorSymbol, right);
     }
 
+    /// <summary>
+    /// Parses a list of arguments for a function call.
+    /// </summary>
+    /// <returns>The parsed list of nodes</returns>
     private List<AstNode> ParseArguments()
     {
         var arguments = new List<AstNode>();
