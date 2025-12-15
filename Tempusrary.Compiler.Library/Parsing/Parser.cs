@@ -64,11 +64,16 @@ public class Parser
         Eat(TokenType.Identifier);
 
         Eat(TokenType.OpenParen);
-        var parameters = new List<string>();
+        var parameters = new List<FunctionParameter>();
         while (_currentToken.Type == TokenType.Identifier)
         {
-            parameters.Add(_currentToken.As<string>());
+            var parameterType = _currentToken.As<string>();
             Eat(TokenType.Identifier);
+            
+            var parameterName = _currentToken.As<string>();
+            Eat(TokenType.Identifier);
+            
+            parameters.Add(new FunctionParameter(parameterType, parameterName));
             if (_currentToken.Type == TokenType.Comma) Eat(TokenType.Comma);
         }
         Eat(TokenType.CloseParen);

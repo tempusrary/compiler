@@ -4,10 +4,16 @@ public abstract class AstNode
 {
 }
 
-public class FunctionDeclaration(string name, List<string> parameters, List<AstNode> body) : AstNode
+public class FunctionParameter(string type, string name)
+{
+    public string Type { get; } = type;
+    public string Name { get; } = name;
+}
+
+public class FunctionDeclaration(string name, List<FunctionParameter> parameters, List<AstNode> body) : AstNode
 {
     public string Name { get; } = name;
-    public List<string> Parameters { get; } = parameters;
+    public List<FunctionParameter> Parameters { get; } = parameters;
     public List<AstNode> Body { get; } = body;
 }
 
