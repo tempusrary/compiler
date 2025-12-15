@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Tempusrary.Compiler.Library/Tempusrary.Compiler.Library.csproj" />
+  <Project Path="Tempusrary.Compiler/Tempusrary.Compiler.csproj" />
+</Solution>
