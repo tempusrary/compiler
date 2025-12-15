@@ -27,20 +27,23 @@ public enum TokenType
     Import,
     Selector,
     Colon,
-    ExclamationMark
+    ExclamationMark,
+    Integer,
+    Decimal
 }
 
 /// <summary>
 /// Represents a token identified by the lexer with associated metadata such as its type, value, and position in the input source
 /// </summary>
-public class Token(TokenType type, string value, int line, int column)
+public class Token(TokenType type, object value, int line, int column)
 {
     public TokenType Type { get; } = type;
-    public string Value { get; } = value;
+    public object Value { get; } = value;
     public int Line { get; } = line;
     public int Column { get; } = column;
 
     public override string ToString() => $"{Type}: {Value}";
+    public T As<T>() => (T)Value;
 }
 
 /// <summary>
@@ -165,8 +168,12 @@ public class Lexer(string input)
             }
         }
 
-        if (!char.IsLetter(Current) && Current != '$' && !"!:".Contains(Current))
+        if (!char.IsLetter(Current) && Current != '$' && !"!:".Contains(Current) && !char.IsDigit(Current))
             throw new ParsingException(this, _line, _column, $"Unexpected character: {Current}");
+        
+        if (char.IsDigit(Current))
+            return new Token(TokenType.Integer, ReadNumber(), _line, _column);
+        
         var identifier = ReadIdentifier();
 
         return Keywords.TryGetValue(identifier, out var type)
@@ -197,5 +204,21 @@ public class Lexer(string input)
         var start = _position;
         while (char.IsLetterOrDigit(Current) || Current == '$' || "!:".Contains(Current)) Next();
         return Input.Substring(start, _position - start);
+    }
+
+    /// <summary>
+    /// Reads a sequence of numbers
+    /// </summary>
+    /// <returns>The read number</returns>
+    private object ReadNumber()
+    {
+        var start = _position;
+        while (char.IsDigit(Current)) Next();
+        if (Current != '.')
+            return int.Parse(Input.Substring(start, _position - start));
+        
+        Next();
+        while (char.IsDigit(Current)) Next();
+        return decimal.Parse(Input.Substring(start, _position - start));
     }
 }

@@ -52,3 +52,13 @@ public class BooleanLiteralNode(bool value) : AstNode
 {
     public bool Value { get; } = value;
 }
+
+public class IntegerLiteralNode(int value) : AstNode
+{
+    public int Value { get; } = value;
+}
+
+public class DecimalLiteralNode(decimal value) : AstNode
+{
+    public decimal Value { get; } = value;
+}

@@ -60,14 +60,14 @@ public class Parser
     public FunctionDeclaration ParseFunction()
     {
         Eat(TokenType.Function);
-        var functionName = _currentToken.Value;
+        var functionName = _currentToken.As<string>();
         Eat(TokenType.Identifier);
 
         Eat(TokenType.OpenParen);
         var parameters = new List<string>();
         while (_currentToken.Type == TokenType.Identifier)
         {
-            parameters.Add(_currentToken.Value);
+            parameters.Add(_currentToken.As<string>());
             Eat(TokenType.Identifier);
             if (_currentToken.Type == TokenType.Comma) Eat(TokenType.Comma);
         }
@@ -95,7 +95,7 @@ public class Parser
             // Handle assignments like `$var = "asd";`
             case TokenType.Identifier:
             {
-                var identifier = _currentToken.Value;
+                var identifier = _currentToken.As<string>();
                 Eat(TokenType.Identifier);
 
                 switch (_currentToken.Type)
@@ -161,13 +161,13 @@ public class Parser
         {
             case TokenType.StringLiteral:
             {
-                var value = _currentToken.Value;
+                var value = _currentToken.As<string>();
                 Eat(TokenType.StringLiteral);
                 return new StringLiteralNode(value);
             }
             case TokenType.Identifier:
             {
-                var name = _currentToken.Value;
+                var name = _currentToken.As<string>();
                 Eat(TokenType.Identifier);
                 return new IdentifierNode(name);
             }
@@ -177,6 +177,14 @@ public class Parser
             case TokenType.False:
                 Eat(TokenType.False);
                 return new BooleanLiteralNode(false);
+            case TokenType.Integer:
+                var integerVal = _currentToken.As<int>();
+                Eat(TokenType.Integer);
+                return new IntegerLiteralNode(integerVal);
+            case TokenType.Decimal:
+                var decimalValue = _currentToken.As<decimal>();
+                Eat(TokenType.Decimal);
+                return new DecimalLiteralNode(decimalValue);
             default:
                 throw new ParsingException(_lexer, _currentToken, $"Unexpected token in primary expression: {_currentToken.Value}");
         }
@@ -190,7 +198,7 @@ public class Parser
     {
         var left = ParsePrimary();
 
-        var operatorSymbol = _currentToken.Value;
+        var operatorSymbol = _currentToken.As<string>();
         Eat(TokenType.DoubleEquals);
 
         var right = ParsePrimary();
