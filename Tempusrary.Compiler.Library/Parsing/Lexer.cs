@@ -25,7 +25,6 @@ public enum TokenType
     False,
     EndOfFile,
     Import,
-    Selector,
     Colon,
     ExclamationMark,
     Integer,
@@ -168,7 +167,7 @@ public class Lexer(string input)
             }
         }
 
-        if (!char.IsLetter(Current) && Current != '$' && !"!:".Contains(Current) && !char.IsDigit(Current))
+        if (!char.IsLetter(Current) && !"!:".Contains(Current) && !char.IsDigit(Current))
             throw new ParsingException(this, _line, _column, $"Unexpected character: {Current}");
         
         if (char.IsDigit(Current))
@@ -202,7 +201,7 @@ public class Lexer(string input)
     private string ReadIdentifier()
     {
         var start = _position;
-        while (char.IsLetterOrDigit(Current) || Current == '$' || "!:".Contains(Current)) Next();
+        while (char.IsLetterOrDigit(Current) || "!:".Contains(Current)) Next();
         return Input.Substring(start, _position - start);
     }
 

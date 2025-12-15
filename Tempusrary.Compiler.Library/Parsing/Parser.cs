@@ -97,10 +97,10 @@ public class Parser
     {
         switch (_currentToken.Type)
         {
-            // Handle assignments like `$var = "asd";`
+            // Handle assignments like `string var = "asd";`
             case TokenType.Identifier:
             {
-                var identifier = _currentToken.As<string>();
+                var first = _currentToken.As<string>();
                 Eat(TokenType.Identifier);
 
                 switch (_currentToken.Type)
@@ -111,15 +111,26 @@ public class Parser
                         // It's a function call
                         var arguments = ParseArguments();
                         Eat(TokenType.Semicolon);
-                        return new FunctionCall(identifier, arguments);
+                        return new FunctionCall(first, arguments);
                     }
-                    case TokenType.Equals:
+                    case TokenType.Identifier:
                     {
-                        // It's an assignment
-                        Eat(TokenType.Equals);
-                        var value = ParsePrimary();
-                        if (_currentToken.Type == TokenType.Semicolon) Eat(TokenType.Semicolon);
-                        return new Assignment(identifier, value);
+                        var identifier = _currentToken.As<string>();
+                        Eat(TokenType.Identifier);
+                        
+                        var variable = new Variable(first, identifier);
+                        switch (_currentToken.Type)
+                        {
+                            case TokenType.Equals:
+                            {
+                                // It's an assignment
+                                Eat(TokenType.Equals);
+                                var value = ParsePrimary();
+                                if (_currentToken.Type == TokenType.Semicolon) Eat(TokenType.Semicolon);
+                                return new Assignment(variable, value);
+                            }
+                        }
+                        return variable;
                     }
                     default:
                         throw new ParsingException(_lexer, _currentToken, $"Unexpected token after identifier: {_currentToken.Value}");

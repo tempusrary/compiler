@@ -3,7 +3,7 @@ using Tempusrary.Compiler.Library.Parsing;
 
 namespace Tempusrary.Compiler;
 
-class Program
+internal class Program
 {
     private static int Main(string[] args)
     {

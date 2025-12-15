@@ -25,9 +25,15 @@ public class IfStatement(BinaryExpression condition, List<AstNode> body) : AstNo
     public List<AstNode> Body { get; } = body;
 }
 
-public class Assignment(string variableName, AstNode value) : AstNode
+public class Variable(string type, string name) : AstNode
 {
-    public string VariableName { get; } = variableName;
+    public string Type { get; } = type;
+    public string Name { get; } = name;
+}
+
+public class Assignment(Variable variable, AstNode value) : AstNode
+{
+    public Variable Variable { get; } = variable;
     public AstNode Value { get; } = value;
 }
 
