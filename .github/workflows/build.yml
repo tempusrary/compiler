@@ -12,7 +12,7 @@ jobs:
     uses: lumentae/actions/.github/workflows/build-dotnet.yml@main
     with:
       project_name: Tempusrary.Compiler
-      dotnet_version: 10.0
+      dotnet_version: "10.0"
   release:
     permissions:
       contents: write
