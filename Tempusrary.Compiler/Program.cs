@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.Numerics;
 using Tempusrary.Compiler.Library.Parsing;
 
 namespace Tempusrary.Compiler;
@@ -38,10 +39,21 @@ internal class Program
         // Iterate files
         foreach (var file in Directory.EnumerateFiles(".", "*.tpsr", SearchOption.AllDirectories))
         {
-            var lexer = new Lexer(File.ReadAllText(file));
-            var parser = new Parser(lexer);
+            Console.WriteLine($"Compiling {file}...");
+            var fileContent = File.ReadAllText(file);
+            var lexerPass1 = new Lexer(fileContent);
+            var parserPass1 = new Parser(lexerPass1);
 
-            var functions = parser.ParseFunctions();
+            var astPass1 = parserPass1.ParseFile();
+            foreach (var function in astPass1) {
+                if (function is not Import import)
+                    continue;
+                fileContent = fileContent.Replace($"import \"{import.Path}\";", File.ReadAllText(import.Path));
+            }
+            
+            var lexer = new Lexer(fileContent);
+            var parser = new Parser(lexer);
+            var ast = parser.ParseFile();
         }
         
         Console.ForegroundColor = ConsoleColor.Green;

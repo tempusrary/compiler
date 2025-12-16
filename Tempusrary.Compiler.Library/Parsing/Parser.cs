@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic;
+﻿using System.Reflection.Metadata.Ecma335;
+using Microsoft.VisualBasic;
 using Tempusrary.Compiler.Library.Utils;
 
 namespace Tempusrary.Compiler.Library.Parsing;
@@ -30,27 +31,30 @@ public class Parser
     }
 
     /// <summary>
-    /// Parses multiple function declarations from the input tokens
+    /// Parses the file from the input tokens
     /// </summary>
-    /// <returns>A list of <see cref="FunctionDeclaration"/> objects with the parsed functions</returns>
-    public List<FunctionDeclaration> ParseFunctions()
+    /// <returns>A list of <see cref="AstNode"/> objects with the parsed functions</returns>
+    public List<AstNode> ParseFile()
     {
-        var functions = new List<FunctionDeclaration>();
+        var nodes = new List<AstNode>();
 
         while (_currentToken.Type != TokenType.EndOfFile)
         {
             if (_currentToken.Type == TokenType.Import)
             {
                 Eat(TokenType.Import);
-                var toImport = _currentToken.Value;
-                // TODO: Implement importing
+                var toImport = _currentToken.As<string>();
                 Eat(TokenType.StringLiteral);
+                Console.WriteLine($"Importing {toImport}");
+                nodes.Add(new Import(toImport));
+                Eat(TokenType.Semicolon);
+                continue;
             }
             var function = ParseFunction();
-            functions.Add(function);
+            nodes.Add(function);
         }
 
-        return functions;
+        return nodes;
     }
 
     /// <summary>
@@ -59,7 +63,8 @@ public class Parser
     /// <returns>A <see cref="FunctionDeclaration"/> representing the parsed function</returns>
     public FunctionDeclaration ParseFunction()
     {
-        Eat(TokenType.Function);
+        var returnType = _currentToken.As<string>();
+        Eat(TokenType.Identifier);
         var functionName = _currentToken.As<string>();
         Eat(TokenType.Identifier);
 
@@ -139,6 +144,13 @@ public class Parser
             // Handle `if` statements like `if ($var == "asd") { ... }`
             case TokenType.If:
                 return ParseIfStatement();
+            case TokenType.Return:
+            {
+                Eat(TokenType.Return);
+                var value = ParsePrimary();
+                Eat(TokenType.Semicolon);
+                return value;
+            }
             default:
                 throw new ParsingException(_lexer, _currentToken, $"Unknown statement: {_currentToken.Value}");
         }

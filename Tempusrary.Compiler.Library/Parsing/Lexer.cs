@@ -28,7 +28,8 @@ public enum TokenType
     Colon,
     ExclamationMark,
     Integer,
-    Decimal
+    Decimal,
+    Return
 }
 
 /// <summary>
@@ -66,6 +67,7 @@ public class Lexer(string input)
         { "true", TokenType.True },
         { "false", TokenType.False },
         { "import", TokenType.Import },
+        { "return", TokenType.Return }
     };
 
     /// <summary>
@@ -164,6 +166,46 @@ public class Lexer(string input)
             {
                 var value = ReadString();
                 return new Token(TokenType.StringLiteral, value, _line, _column);
+            }
+            case '/':
+            {
+                Next();
+                switch (Current)
+                {
+                    case '/':
+                    {
+                        // Single-line comment, skip to end of line
+                        while (Current != '\n' && Current != '\0') Next();
+                        return NextToken();
+                    }
+                    case '*':
+                    {
+                        // Multi-line comment, skip until closing */
+                        Next();
+                        while (true)
+                        {
+                            if (Current == '\0')
+                                throw new ParsingException(this, _line, _column, "Unterminated multi-line comment");
+
+                            if (Current == '*')
+                            {
+                                Next();
+                                if (Current == '/')
+                                {
+                                    Next();
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Next();
+                            }
+                        }
+                        return NextToken();
+                    }
+                    default:
+                        throw new ParsingException(this, _line, _column, $"Unexpected character: /");
+                }
             }
         }
 

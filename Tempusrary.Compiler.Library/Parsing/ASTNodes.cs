@@ -2,6 +2,12 @@
 
 public abstract class AstNode
 {
+    
+}
+
+public class Import(string path) : AstNode
+{
+    public string Path { get; } = path;
 }
 
 public class FunctionParameter(string type, string name)
@@ -34,6 +40,11 @@ public class Variable(string type, string name) : AstNode
 public class Assignment(Variable variable, AstNode value) : AstNode
 {
     public Variable Variable { get; } = variable;
+    public AstNode Value { get; } = value;
+}
+
+public class Return(AstNode value) : AstNode
+{
     public AstNode Value { get; } = value;
 }
 
